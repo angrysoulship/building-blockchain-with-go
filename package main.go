@@ -28,6 +28,8 @@ func NewBlock(data string, prevBlockhash []byte) *Block {
 	return &block
 }
 
+//2. CreateHash
+
 func (block *Block) SetHash() {
 	//1. 拼装数据
 	blockInfo := append(block.PrevHash, block.Data...)
@@ -37,11 +39,40 @@ func (block *Block) SetHash() {
 	block.Hash = hash[:]
 }
 
-func main() {
-	block := NewBlock("Alice has transfered a bitcoin to Bob!!", []byte{})
+//3. Create blockchain
+type Blockchain struct {
+	blocks []*Block
+}
 
-	fmt.Printf("Previous Block hash: %x\n", block.PrevHash)
-	fmt.Printf("Current Block hash: %x\n", block.Hash)
-	fmt.Printf("Data: %s\n", block.Data)
-	fmt.Println("hello")
+//3a. the first block
+func GenesisBlock() *Block {
+	return NewBlock("GenesisBlock", []byte{})
+}
+
+func NewBlockChain() *Blockchain {
+	genesisBlock := GenesisBlock()
+	return &Blockchain{
+		blocks: []*Block{genesisBlock},
+	}
+}
+
+//4. Add block into blockchain
+func (bc *Blockchain) AddBlock(data string) {
+	block := NewBlock(data, bc.blocks[len(bc.blocks)-1].Hash)
+	bc.blocks = append(bc.blocks, block)
+}
+
+func main() {
+	bc := NewBlockChain()
+	// block := NewBlock("Alice has transfered a bitcoin to Bob!!", []byte{})
+	bc.AddBlock("Alice has transfered a bitcoin to Bob!!")
+	bc.AddBlock("Alice has transfered a bitcoin to EO!!")
+
+	for i, block := range bc.blocks {
+		fmt.Printf("======  Current Blockchain Height: %d  ======= \n", i)
+		fmt.Printf("Previous Block hash: %x\n", block.PrevHash)
+		fmt.Printf("Current Block hash: %x\n", block.Hash)
+		fmt.Printf("Data: %s\n\n", block.Data)
+	}
+
 }
