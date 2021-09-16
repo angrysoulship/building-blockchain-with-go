@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
+	"encoding/binary"
+	"log"
 	"time"
 )
 
@@ -26,12 +29,6 @@ type Block struct {
 	Data []byte
 }
 
-//实现辅助函数，uint64转[]byte
-
-func Uint64ToByte(num uint64) []byte {
-	return []byte{}
-}
-
 //1. Create a block
 func NewBlock(data string, prevBlockhash []byte) *Block {
 	block := Block{
@@ -45,29 +42,57 @@ func NewBlock(data string, prevBlockhash []byte) *Block {
 		Data:       []byte(data),
 	}
 
-	block.SetHash()
+	// block.SetHash()
+	// 创建pow对象
+	pow := NewProofOfWork(&block)
+	// 计算查找目标随机数
+	hash, nouce := pow.Run()
+
+	// 根据挖矿结果进行对区块数据进行更新
+	block.Hash = hash
+	block.Nouce = nouce
 
 	return &block
+}
+
+// uint64转[]byte辅助函数
+func Uint64ToByte(num uint64) []byte {
+	var buffer bytes.Buffer
+
+	err := binary.Write(&buffer, binary.BigEndian, num)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	return buffer.Bytes()
 }
 
 //2. CreateHash
 
 func (block *Block) SetHash() {
-	//1. 拼装数据
-	var blockInfo []byte
-	blockInfo = append(blockInfo, byte(block.Version))
-	blockInfo = append(blockInfo, block.PrevHash...)
-	blockInfo = append(blockInfo, block.MerkleRoot...)
-	blockInfo = append(blockInfo, byte(block.TimeStamp))
-	blockInfo = append(blockInfo, byte(block.Difficulty))
-	blockInfo = append(blockInfo, byte(block.Nouce))
-	blockInfo = append(blockInfo, block.Data...)
+	// 1. 拼装数据
+	// var blockInfo []byte
+	// blockInfo = append(blockInfo, byte(block.Version))
+	// blockInfo = append(blockInfo, block.PrevHash...)
+	// blockInfo = append(blockInfo, block.MerkleRoot...)
+	// blockInfo = append(blockInfo, byte(block.TimeStamp))
+	// blockInfo = append(blockInfo, byte(block.Difficulty))
+	// blockInfo = append(blockInfo, byte(block.Nouce))
+	// blockInfo = append(blockInfo, block.Data...)
+
+	tmp := [][]byte{
+		Uint64ToByte(block.Version),
+		block.PrevHash,
+		block.MerkleRoot,
+		Uint64ToByte(block.TimeStamp),
+		Uint64ToByte(block.Difficulty),
+		Uint64ToByte(block.Nouce),
+		block.Data,
+	}
+
+	blockInfo := bytes.Join(tmp, []byte{})
 
 	//2. SHA256
 	hash := sha256.Sum256(blockInfo)
 	block.Hash = hash[:]
 }
-
-//3. 补充区块字段
-//4. 更新计算哈希函数
-//5. 优化代码
