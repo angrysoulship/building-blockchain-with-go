@@ -55,6 +55,10 @@ func NewBlock(data string, prevBlockhash []byte) *Block {
 	return &block
 }
 
+func (block *Block) toByte() []byte {
+	return []byte{}
+}
+
 // uint64转[]byte辅助函数
 func Uint64ToByte(num uint64) []byte {
 	var buffer bytes.Buffer
