@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/binary"
+	"encoding/gob"
 	"log"
 	"time"
 )
@@ -55,8 +56,35 @@ func NewBlock(data string, prevBlockhash []byte) *Block {
 	return &block
 }
 
-func (block *Block) toByte() []byte {
-	return []byte{}
+// 序列化
+func (block *Block) Serialize() []byte {
+	var buffer bytes.Buffer
+
+	// 定义一个编码器，使用编码器进行编码
+	encoder := gob.NewEncoder(&buffer)
+	err := encoder.Encode(&block)
+	if err != nil {
+		log.Panic("编码出错")
+	}
+
+	return buffer.Bytes()
+}
+
+// 反序列化
+func Deserialize(data []byte) Block {
+	// 定义一个解码器
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+
+	var block Block
+
+	// 进行解码
+	err := decoder.Decode(&block)
+	if err != nil {
+		log.Panic("decode fail")
+	}
+
+	return block
+
 }
 
 // uint64转[]byte辅助函数
