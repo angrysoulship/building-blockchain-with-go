@@ -35,11 +35,19 @@ func (cli *CLI) Run() {
 	cmd := args[1]
 	switch cmd {
 	case "addBlock":
-		fmt.Println("添加区块")
+		fmt.Printf("添加区块\n")
+		if len(args) == 4 && args[2] == "--data" {
+			data := args[3]
+			cli.AddBlock(data)
+		} else {
+			fmt.Println("wrong input, please check again.")
+			fmt.Println(Usage)
+		}
 	case "printChain":
-		fmt.Println("打印区块")
+		fmt.Printf("打印区块\n")
+		cli.PrintBlockChain()
 	default:
-		fmt.Println("pleasecheckagian")
+		fmt.Printf("pleasecheckagian\n")
 		fmt.Println(Usage)
 	}
 
