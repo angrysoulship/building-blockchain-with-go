@@ -58,6 +58,7 @@ func (pow *ProofOfWork) Run() ([]byte, uint64) {
 
 		tmpInt.SetBytes(hash[:])
 		if tmpInt.Cmp(pow.target) == -1 {
+			fmt.Println("Mining start...")
 			fmt.Printf("Mining Success! Hash: %x, nouce: %d\n", hash, nouce)
 			break
 		} else {

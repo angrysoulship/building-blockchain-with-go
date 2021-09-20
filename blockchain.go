@@ -15,6 +15,7 @@ type Blockchain struct {
 }
 
 const blockChainDb = "blockChain.db"
+const blockBucket = "blockBucket"
 
 func NewBlockChain() *Blockchain {
 
@@ -35,9 +36,9 @@ func NewBlockChain() *Blockchain {
 	//改写
 	db.Update(func(tx *bolt.Tx) error {
 		//找到bucket，没有就创建
-		bucket := tx.Bucket([]byte("b1"))
+		bucket := tx.Bucket([]byte(blockBucket))
 		if bucket == nil {
-			bucket, err = tx.CreateBucket([]byte("b1"))
+			bucket, err = tx.CreateBucket([]byte(blockBucket))
 			if err != nil {
 				log.Panic("创建bucket失败")
 			}
@@ -49,7 +50,7 @@ func NewBlockChain() *Blockchain {
 			bucket.Put([]byte("LastHashKey"), genesisBlock.Hash)
 			lastHash = genesisBlock.Hash
 
-			// test, test的时候要先rm blockchaindb
+			//test, test的时候要先rm blockchaindb
 			// blockBytes := bucket.Get(genesisBlock.Hash)
 			// fmt.Printf("block info : %s\n", Deserialize(blockBytes))
 
@@ -78,7 +79,7 @@ func (bc *Blockchain) AddBlock(data string) {
 	// 创建区块
 	db.Update(func(tx *bolt.Tx) error {
 
-		bucket := tx.Bucket([]byte("b1"))
+		bucket := tx.Bucket([]byte(blockBucket))
 		if bucket == nil {
 			log.Panic("bucket can not be empty, please check!")
 		}
