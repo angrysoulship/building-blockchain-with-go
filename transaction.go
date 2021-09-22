@@ -7,6 +7,8 @@ import (
 	"log"
 )
 
+const reward = 12.5
+
 type Transaction struct {
 	TXID      []byte //交易id
 	TXInputs  []TXInput
@@ -42,5 +44,19 @@ func (tx *Transaction) SetHash() {
 	data := buffer.Bytes()
 	hash := sha256.Sum256(data)
 	tx.TXID = hash[:]
+
+}
+
+// create transaction
+func NewCoinBaseTX(address string, data string) *Transaction {
+	// CoinbaseTX has 1. only one input, 2 no need for import transactionID, 3. no need for import index
+	// 挖矿不需要指定签名，data可以由矿工自由填写
+	input := TXInput{TXid: []byte{}, Index: 0, Sig: data}
+	ouput := TXOutput{Value: reward, PubKeyHash: address}
+
+	tx := Transaction{TXID: []byte{}, TXInputs: []TXInput{input}, TXOutputs: []TXOutput{ouput}}
+	tx.SetHash()
+
+	return &tx
 
 }
