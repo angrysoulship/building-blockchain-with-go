@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/binary"
 	"encoding/gob"
 	"log"
@@ -27,21 +26,25 @@ type Block struct {
 	//a. current Hash, 正常比特币没有当前区块hash，这么做是为了简化
 	Hash []byte
 	//b. data
-	Data []byte
+	// Data []byte
+	// Transaction
+	Transaction []*Transaction
 }
 
 //1. Create a block
-func NewBlock(data string, prevBlockhash []byte) *Block {
+func NewBlock(txs []*Transaction, prevBlockhash []byte) *Block {
 	block := Block{
-		Version:    00,
-		PrevHash:   prevBlockhash,
-		MerkleRoot: []byte{},
-		TimeStamp:  uint64(time.Now().Unix()),
-		Difficulty: 0, // 无效
-		Nouce:      0, //无效
-		Hash:       []byte{},
-		Data:       []byte(data),
+		Version:     00,
+		PrevHash:    prevBlockhash,
+		MerkleRoot:  []byte{},
+		TimeStamp:   uint64(time.Now().Unix()),
+		Difficulty:  0, // 无效
+		Nouce:       0, //无效
+		Hash:        []byte{},
+		Transaction: txs,
 	}
+
+	block.MerkleRoot = block.MakeMerkleRoot()
 
 	// block.SetHash()
 	// 创建pow对象
@@ -112,19 +115,24 @@ func (block *Block) SetHash() {
 	// blockInfo = append(blockInfo, byte(block.Nouce))
 	// blockInfo = append(blockInfo, block.Data...)
 
-	tmp := [][]byte{
-		Uint64ToByte(block.Version),
-		block.PrevHash,
-		block.MerkleRoot,
-		Uint64ToByte(block.TimeStamp),
-		Uint64ToByte(block.Difficulty),
-		Uint64ToByte(block.Nouce),
-		block.Data,
-	}
+	// tmp := [][]byte{
+	// 	Uint64ToByte(block.Version),
+	// 	block.PrevHash,
+	// 	block.MerkleRoot,
+	// 	Uint64ToByte(block.TimeStamp),
+	// 	Uint64ToByte(block.Difficulty),
+	// 	Uint64ToByte(block.Nouce),
+	// 	block.data
+	// }
 
-	blockInfo := bytes.Join(tmp, []byte{})
+	// blockInfo := bytes.Join(tmp, []byte{})
 
-	//2. SHA256
-	hash := sha256.Sum256(blockInfo)
-	block.Hash = hash[:]
+	// //2. SHA256
+	// hash := sha256.Sum256(blockInfo)
+	// block.Hash = hash[:]
+}
+
+// 模拟merkleRoot, 只是拼接，不做二叉树
+func (block *Block) MakeMerkleRoot() []byte {
+	return []byte{}
 }

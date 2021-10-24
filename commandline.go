@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 func (cli *CLI) AddBlock(data string) {
-	cli.bc.AddBlock(data)
+	// cli.bc.AddBlock(txs)
 	fmt.Printf("Add Block Successful\n")
 }
 
@@ -24,7 +24,7 @@ func (cli *CLI) PrintBlockChain() {
 		fmt.Printf("Nouce: %x\n", block.Nouce)
 		fmt.Printf("Difficulty: %x\n", block.Difficulty)
 		fmt.Printf("Timestamp: %x\n", block.TimeStamp)
-		fmt.Printf("Data: %s\n", block.Data)
+		fmt.Printf("CoinbaseTX data: %s\n", block.Transaction[0].TXInputs[0].Sig)
 
 		if len(block.PrevHash) == 0 {
 			fmt.Println("iteration ends here")

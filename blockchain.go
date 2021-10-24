@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/boltdb/bolt"
@@ -17,7 +18,7 @@ type Blockchain struct {
 const blockChainDb = "blockChain.db"
 const blockBucket = "blockBucket"
 
-func NewBlockChain() *Blockchain {
+func NewBlockChain(address string) *Blockchain {
 
 	// return &Blockchain{
 	// 	blocks: []*Block{genesisBlock},
@@ -43,7 +44,8 @@ func NewBlockChain() *Blockchain {
 				log.Panic("创建bucket失败")
 			}
 
-			genesisBlock := GenesisBlock()
+			genesisBlock := GenesisBlock(address)
+			fmt.Printf("genesisBlock: %s\n", genesisBlock)
 
 			//3. 写数据 hash作为key，block字节流作为value
 			bucket.Put(genesisBlock.Hash, genesisBlock.Serialize())
@@ -66,11 +68,12 @@ func NewBlockChain() *Blockchain {
 }
 
 //3a. the first block
-func GenesisBlock() *Block {
-	return NewBlock("GenesisBlock", []byte{})
+func GenesisBlock(address string) *Block {
+	coinbase := NewCoinBaseTX(address, "GenesisBlock")
+	return NewBlock([]*Transaction{coinbase}, []byte{})
 }
 
-func (bc *Blockchain) AddBlock(data string) {
+func (bc *Blockchain) AddBlock(txs []*Transaction) {
 	// block := NewBlock(data, bc.blocks[len(bc.blocks)-1].Hash)
 	// bc.blocks = append(bc.blocks, block)
 	// 区块链数据块和最后区块的hash
@@ -85,7 +88,7 @@ func (bc *Blockchain) AddBlock(data string) {
 		}
 
 		// 创建新的区块
-		block := NewBlock(data, lastHash)
+		block := NewBlock(txs, lastHash)
 
 		// add to database
 		bucket.Put(block.Hash, block.Serialize())
@@ -98,3 +101,11 @@ func (bc *Blockchain) AddBlock(data string) {
 	})
 
 }
+
+func (bc *Blockchain) FindUTXOs(address string) []TXOutput {
+	var UTXO []TXOutput
+
+	return UTXO
+}
+
+

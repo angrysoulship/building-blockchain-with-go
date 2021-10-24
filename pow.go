@@ -45,7 +45,6 @@ func (pow *ProofOfWork) Run() ([]byte, uint64) {
 			Uint64ToByte(block.TimeStamp),
 			Uint64ToByte(block.Difficulty),
 			Uint64ToByte(nouce),
-			block.Data,
 		}
 
 		blockInfo := bytes.Join(tmp, []byte{})
